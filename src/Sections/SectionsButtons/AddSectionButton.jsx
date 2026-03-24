@@ -1,17 +1,10 @@
 import React from "react";
 
-export function AddSectionButton({
-  classId,
-  subjectName,
-  navigate,
-  c,
-  subjectId,
-}) {
+export function AddSectionButton({ navigate, c, classId, subjectId, subjectName }) {
   const handleChange = (e) => {
     const value = e.target.value;
     if (!value) return;
-
-    navigate(`/${classId}}/${subjectId}/${c?._id}/add-sections`, {
+    navigate(`/${classId}/${subjectId}/${c?._id}/add-sections`, {
       state: {
         addButton: value,
         chapterId: c._id,
@@ -25,8 +18,11 @@ export function AddSectionButton({
 
   return (
     <>
-      <select onChange={handleChange} className="btn form-select-sm btn-outline-info btn-sm">
-        <option value="">Add</option>
+      <select
+        onChange={handleChange}
+        className="btn form-select-sm btn-outline-info btn-sm w-25"
+      >
+        <option value="">+</option>
         <option value="sections">Section</option>
         <option value="meanings">Meanings</option>
       </select>

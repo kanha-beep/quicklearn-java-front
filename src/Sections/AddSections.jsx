@@ -49,6 +49,7 @@ export default function AddSections() {
     );
     console.log("section added ended on section add page");
   };
+  console.log("adding view for: ", sections);
   return (
     <div>
       <h1>Add Sections</h1>

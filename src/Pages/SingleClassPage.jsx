@@ -1,61 +1,60 @@
 import { useEffect, useState } from "react";
-import { api } from "../../api.js";
 import { useNavigate, useParams } from "react-router-dom";
-import { OpenChapterButton } from "../Pages/OpenChapterButton.jsx";
 import SubjectHomeCard from "../Subjects/SubjectHomeCard.jsx";
 import { Loading } from "../Components/Loading.jsx";
-import { MainPageHeading } from "../Pages/MainPageHeading.jsx";
-import { GetAllSubjects } from "../Subjects/SubjectsComponents/GetAllSubjects.js";
+import { useSubjects } from "../hooks.js";
+import { ArrowLeft } from "lucide-react";
+
 export default function SingleClassPage() {
   const [searchSubject, setSearchSubject] = useState("");
   const { classId } = useParams();
-
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(true);
-  const [subjects, setSubjects] = useState([]);
-  // const [classes, setClasses] = useState([]);
-  useEffect(() => {
-    const getAllSubjects = async () => {
-      GetAllSubjects(api, setSubjects, setLoading, classId);
-    };
-    getAllSubjects();
-  }, []);
-  // console.log("subjects: ", subjects);
-  console.log("got classId from params of /classId: ", classId);
+  const [loading, setLoading] = useState(false);
+  const subjects = useSubjects(classId);
   if (loading) return <Loading loading={loading} />;
-  // console.log("searched subject: ", searchSubject);
-  const filterSubjects = subjects.filter((s) => {
-    try {
-      return new RegExp(searchSubject, "i").test(s?.subject_name);
-    } catch {
-      return true;
-    }
-  });
-  console.log("filtered subjects: ", filterSubjects);
-  return (
-    <div className="mx-auto px-4">
-      <MainPageHeading />
-      <div className="row">
-        <div className="col-2">
-          <input
-            className="form-control"
-            placeholder="Enter Subject Name"
-            onChange={(e) => setSearchSubject(e.target.value)}
-          />
-        </div>
-        <div className="col-2">
-          <button
-            className="btn btn-primary w-100"
-            onClick={() => navigate(`/${classId}/add-subject`)}
-          >
-            Add Subject
-          </button>
-        </div>
-      </div>
 
-      <div className="row">
+  const normalizedQuery = searchSubject.trim().toLowerCase();
+  const filterSubjects = subjects.filter((s) =>
+    (s?.subject_name ?? "").toLowerCase().includes(normalizedQuery),
+  );
+
+  return (
+    <div className="mx-auto w-full max-w-7xl p-3 sm:p-5">
+      <section className="rounded-3xl border border-slate-200 bg-gradient-to-br from-sky-50 via-white to-emerald-50 p-4 shadow-sm sm:p-6">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+              Class Workspace
+            </p>
+            <h1 className="mt-1 text-2xl font-bold text-slate-900 sm:text-3xl">
+              Subjects
+            </h1>
+            <p className="mt-1 text-sm text-slate-600">
+              Search and open chapters for this class.
+            </p>
+          </div>
+        </div>
+
+        <div className="mt-4 flex flex-wrap items-center gap-3">
+          <div className="w-64 max-w-full">
+            <input
+              type="text"
+              value={searchSubject}
+              onChange={(e) => setSearchSubject(e.target.value)}
+              placeholder="Search subject"
+              className="form-control"
+            />
+          </div>
+          <p className="text-sm font-medium text-slate-600">
+            {filterSubjects.length} subject
+            {filterSubjects.length !== 1 ? "s" : ""}
+          </p>
+        </div>
+      </section>
+
+      <div className="row mt-4">
         {filterSubjects.map((subject) => (
-          <div key={subject?._id} className="col-3">
+          <div key={subject?._id} className="col-12 col-sm-6 col-lg-4 col-xl-3">
             <SubjectHomeCard
               subject={subject}
               navigate={navigate}
@@ -64,7 +63,21 @@ export default function SingleClassPage() {
           </div>
         ))}
       </div>
-      <button onClick={() => navigate("/")} className="btn btn-secondary">
+
+      {filterSubjects.length === 0 && (
+        <div className="mt-4 rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-7 text-center">
+          <h3 className="text-lg font-semibold text-slate-800">No subject found</h3>
+          <p className="mt-1 text-sm text-slate-500">
+            Try a different keyword or add a new subject.
+          </p>
+        </div>
+      )}
+
+      <button
+        onClick={() => navigate("/")}
+        className="mt-4 inline-flex items-center gap-2 rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100"
+      >
+        <ArrowLeft className="h-4 w-4" />
         Go back to Classes
       </button>
     </div>

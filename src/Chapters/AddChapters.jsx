@@ -16,12 +16,14 @@ export default function AddChapters() {
   // const [subjectName, setSubjectName] = useState("");
   const [chapterName, setChapterName] = useState("");
   // add chapter to list
+  console.log("order created: ", order);
   const handleAddChapter = () => {
     AddChapterToList(
       chapterName,
       setChaptersList,
       chaptersList,
-      setChapterName
+      setChapterName,
+      setOrder
     );
     console.log("chapter added");
   };
@@ -61,7 +63,7 @@ export default function AddChapters() {
         <AddChapterButton handleAddChapter={handleAddChapter} />
         {chaptersList.map((ch, index) => (
           <div key={index} className="p-3 border rounded mb-3 bg-gray-50">
-            <ShowChaptersList ch={ch} />
+            <ShowChaptersList ch={ch} order={order} />
           </div>
         ))}
         <SaveChapterButton />

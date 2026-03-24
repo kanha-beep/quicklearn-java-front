@@ -5,7 +5,9 @@ import { api } from "../../api";
 
 export default function EditChapters() {
   const navigate = useNavigate();
-  const [order, setOrder] = React.useState();
+  console.log("useLocation:", useLocation());
+  const chapterO= useLocation().state?.chapterO;
+  const [order, setOrder] = React.useState(chapterO);
   const { subjectId, chapterId, classId } = useParams();
   const chapterN = useLocation().state?.chapterN;
   console.log("EditSections props: ", chapterN);
@@ -26,7 +28,7 @@ export default function EditChapters() {
       console.error("Error updating section: ", err?.response?.data);
     }
   };
-  console.log("chapterName: ", chapterName);
+  console.log("chapterName: ", chapterName, chapterO);
   return (
     <div>
       <h1>Edit Chapter</h1>

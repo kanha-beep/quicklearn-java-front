@@ -1,34 +1,29 @@
-import { useLocation, useNavigate, useParams } from "react-router-dom";
-import React from "react";
-import { useState } from "react";
-import { api } from "../../api";
+import { useNavigate, useParams } from "react-router-dom";
+import React, { useState } from "react";
+import { useAddSubject } from "../hooks";
 
 export default function AddClass() {
   const { classId } = useParams();
-  console.log("classId: ", classId);
   const navigate = useNavigate();
   const [subjectName, setSubjectName] = useState("");
   const [order, setOrder] = useState("");
+  const addSubjectCalled = useAddSubject();
+
   const handleAddSubject = async (e) => {
     e.preventDefault();
     try {
-      const res = await api.post(`/subjects/${classId}/add-subjects`, {
-        subjectName,
-        order,
-      });
-      console.log("added class: ", res?.data);
+      await addSubjectCalled(classId, subjectName, order);
       return navigate(`/${classId}`);
     } catch (error) {
       console.log("error adding class: ", error?.response?.data?.msg);
       return navigate(`/${classId}`);
     }
   };
-  console.log("subjectName: ", subjectName);
+
   return (
     <div>
       <h1>Add Class</h1>
       <form onSubmit={handleAddSubject}>
-        {/* Subject Name */}
         <select
           className="w-full border p-3 rounded mb-6"
           onChange={(e) => setSubjectName(e.target.value)}
@@ -55,9 +50,7 @@ export default function AddClass() {
           onChange={(e) => setOrder(e.target.value)}
           className="form-control"
         />
-        <button type="submit" className="btn btn-secondary my-2">
-          Add Subject
-        </button>
+        <button className="btn btn-secondary my-2">Add Subject</button>
       </form>
     </div>
   );

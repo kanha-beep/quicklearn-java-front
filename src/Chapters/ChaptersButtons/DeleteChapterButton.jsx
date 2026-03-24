@@ -1,13 +1,15 @@
 import React from "react";
+import { useDeleteChapter } from "../../hooks";
 
-export function DeleteChapterButton({ handleDeleteChapter, chapter }) {
+export function DeleteChapterButton({ chapter, subjectId }) {
+  const deleteChapter = useDeleteChapter();
   return (
     <div>
       <button
         className="btn btn-outline-danger btn-sm"
-        onClick={() => handleDeleteChapter(chapter?._id)}
+        onClick={() => deleteChapter(subjectId, chapter?._id)}
       >
-        <span className="bi bi-trash fs-7">Delete</span>
+        <span className="bi bi-trash fs-7"></span>
       </button>
     </div>
   );

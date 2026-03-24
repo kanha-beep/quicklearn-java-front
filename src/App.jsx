@@ -8,10 +8,12 @@ import AddSections from "./Sections/AddSections.jsx";
 import EditSections from "./Sections/EditSections.jsx";
 import EditChapters from "./Chapters/EditChapters.jsx";
 import ProtectedRoute from "./Pages/ProtectedRoute.jsx";
-import Auth from "./Auth/Auth.jsx";
+import AdminRoute from "./Pages/AdminRoute.jsx";
+import Auth from "./Pages/Auth.jsx";
 import SingleClassPage from "./Pages/SingleClassPage.jsx";
 import AddClass from "./Class/AddClass.jsx";
 import AddSubject from "./Subjects/AddSubject.jsx";
+import DashboardPage from "./Pages/DashboardPage.jsx";
 function App() {
   const [userRoles, setUserRoles] = useState("");
   const [currentView, setCurrentView] = useState("home");
@@ -58,8 +60,20 @@ function App() {
                   element={<HomePage onSubjectClick={handleSubjectClick} />}
                 />
                 <Route
+                  path="/dashboard"
+                  element={
+                    <AdminRoute>
+                      <DashboardPage />
+                    </AdminRoute>
+                  }
+                />
+                <Route
                   path="/add-class"
-                  element={<AddClass onSubjectClick={handleSubjectClick} />}
+                  element={
+                    <AdminRoute>
+                      <AddClass onSubjectClick={handleSubjectClick} />
+                    </AdminRoute>
+                  }
                 />
                 <Route
                   path="/:classId"
@@ -67,7 +81,14 @@ function App() {
                     <SingleClassPage onSubjectClick={handleSubjectClick} />
                   }
                 />
-                <Route path="/:classId/add-subject" element={<AddSubject />} />
+                <Route
+                  path="/:classId/add-subject"
+                  element={
+                    <AdminRoute>
+                      <AddSubject />
+                    </AdminRoute>
+                  }
+                />
                 <Route path="/:classId/:subjectId/add-chapters" element={<AddChapters />} />
                 <Route path="/:classId/:subjectId/:chapterId/add-sections" element={<AddSections />} />
                 <Route

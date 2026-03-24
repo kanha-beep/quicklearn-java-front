@@ -1,7 +1,7 @@
 import { useNavigate, useParams } from "react-router-dom";
 import React from "react";
 import { useState } from "react";
-import { api } from "../../api";
+import { api } from "../../api.js";
 
 export default function AddClass() {
   const { classId } = useParams();
@@ -12,6 +12,7 @@ export default function AddClass() {
   const handleAddClass = async (e) => {
     e.preventDefault();
     try {
+      console.log("adding class: ", classes);
       const res = await api.post(`/class/add-class`, { classes , order});
       console.log("added class: ", res?.data);
       setClasses("");
