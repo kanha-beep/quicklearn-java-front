@@ -19,7 +19,7 @@ export const deleteChapterRoute = (subjectId, chapterId) => api.delete(`/api/sub
 //sections
 export const addSectionRoute = (subjectId, chapterId, sections) => api.post(`/api/subjects/${subjectId}/chapters/${chapterId}/sections/add-section`, sections)
 export const sectionRoute = (subjectId, chapterId) => api.get(`/api/subjects/${subjectId}/chapters/${chapterId}/sections`)
-export const singleSectionRoute = (subjectId, chapterId, sectionId) => api.get(`/api/${subjectId}/chapters/${chapterId}/sections/${sectionId}`)
+export const singleSectionRoute = (subjectId, chapterId, sectionId) => api.get(`/api/subjects/${subjectId}/chapters/${chapterId}/sections/${sectionId}`)
 export const editSectionRoute = (subjectId, chapterId, sectionId) => api.get(`/api/subjects/${subjectId}/chapters/${chapterId}/sections/${sectionId}/edit`)
 export const updateSectionRoute = (subjectId, chapterId, sectionId, sectionData, order) => api.patch(`/api/subjects/${subjectId}/chapters/${chapterId}/sections/${sectionId}/edit`, {
   sectionName: sectionData.sectionName,

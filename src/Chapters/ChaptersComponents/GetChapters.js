@@ -1,7 +1,7 @@
 export const GetChapters = async (api,_id, setChapterCount, setChaptersList, setSubjectName) => {
     try {
         console.log("Getting chapters for subjectId:", _id);
-        const res = await api.get(`/subjects/${_id}/chapters`);
+        const res = await api.get(`/api/subjects/${_id}/chapters`);
         console.log("Chapters API response:", res?.data);
         setChapterCount(res?.data?.chaptersCount || 0);
         setSubjectName(res?.data?.subjectName?.subject_name || "");

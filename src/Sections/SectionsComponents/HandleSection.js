@@ -8,7 +8,7 @@ export const HandleSections = async (openChapterId, chapterId, setOpenChapterId,
             return;
         }
         
-        const url = `/subjects/${_id}/chapters/${chapterId}/sections`;
+        const url = `/api/subjects/${_id}/chapters/${chapterId}/sections`;
         console.log("Making API call to:", url);
         
         const res = await api.get(url);

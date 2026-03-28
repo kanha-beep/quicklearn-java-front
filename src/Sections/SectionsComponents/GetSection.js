@@ -1,7 +1,7 @@
 export const GetSection = async (api, subjectId, chapterId, sectionId, setSectionData) => {
     try {
         const res = await api.get(
-            `/subjects/${subjectId}/chapters/${chapterId}/sections/${sectionId}`
+            `/api/subjects/${subjectId}/chapters/${chapterId}/sections/${sectionId}`
         );
         console.log("Section data for editing: ", res?.data?.section);
         setSectionData({

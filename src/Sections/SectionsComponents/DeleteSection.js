@@ -11,7 +11,7 @@ export const DeleteSection = async (api, _id, chapterId, sectionId, setSectionsL
     }
     try {
         await api.delete(
-            `/subjects/${_id}/chapters/${chapterId}/sections/${sectionId}/delete`
+            `/api/subjects/${_id}/chapters/${chapterId}/sections/${sectionId}/delete`
         );
         if (typeof setSectionsList === "function") {
             setSectionsList((prevSections = []) =>

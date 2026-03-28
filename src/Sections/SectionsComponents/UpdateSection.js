@@ -2,7 +2,7 @@ export const UpdateSection = async (e, api, subjectId, chapterId, sectionId, sec
     e.preventDefault();
     try {
         const res = await api.patch(
-            `/subjects/${subjectId}/chapters/${chapterId}/sections/${sectionId}/edit`,
+            `/api/subjects/${subjectId}/chapters/${chapterId}/sections/${sectionId}/edit`,
             {
                 sectionName: sectionData.sectionName,
                 sectionContent: sectionData.sectionContent,

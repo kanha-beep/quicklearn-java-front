@@ -10,7 +10,7 @@ export const AddChapter = async (
   if (chaptersList.length === 0) return alert("Add at least one chapter");
 
   try {
-    const res = await api.post(`/subjects/${subjectId}/chapters/add-chapters`, {
+    const res = await api.post(`/api/subjects/${subjectId}/chapters/add-chapters`, {
       chapters: chaptersList,
       classId,
     });

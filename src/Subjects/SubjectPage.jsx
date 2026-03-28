@@ -185,7 +185,7 @@ export default function SubjectPage() {
     setIsSavingSubsection(true);
     try {
       await api.patch(
-        `/subjects/${subjectId}/chapters/${activeChapterId}/sections/${selectedSection._id}/edit`,
+        `/api/subjects/${subjectId}/chapters/${activeChapterId}/sections/${selectedSection._id}/edit`,
         {
           sectionName: selectedSection.section_name,
           sectionContent: selectedSection.section_content,

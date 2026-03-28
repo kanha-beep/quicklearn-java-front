@@ -16,7 +16,7 @@ export default function EditChapters() {
     e.preventDefault();
     try {
       const res = await api.patch(
-        `/subjects/${subjectId}/chapters/${chapterId}/edit`,
+        `/api/subjects/${subjectId}/chapters/${chapterId}/edit`,
         {
           chapterName,
           order,
