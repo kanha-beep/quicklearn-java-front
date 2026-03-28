@@ -13,7 +13,7 @@ export default function HomePage() {
 
   useEffect(() => {
     const getAllClasses = async () => {
-      const res = await api.get("/class");
+      const res = await api.get("/api/class");
       setClasses(res?.data?.getAllClasses || []);
       setLoading(false);
     };

@@ -10,7 +10,7 @@ export default function AddClass() {
   const handleAddClass = async (e) => {
     e.preventDefault();
     try {
-      await api.post(`/class/add-class`, { classes, order });
+      await api.post(`/api/class/add-class`, { classes, order });
       setClasses("");
       setOrder("");
       return navigate("/");

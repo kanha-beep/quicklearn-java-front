@@ -31,7 +31,7 @@ export default function Auth({
   const handleUserAuth = WrapAsync(
     async () => {
       if (isLogin) {
-        const res = await api.post("/auth/login", formData);
+        const res = await api.post("/api/auth/login", formData);
         localStorage.setItem("user", JSON.stringify(res?.data?.user));
         localStorage.setItem("token", res?.data?.token);
         const role = res?.data?.roles || res?.data?.user?.roles || "";
@@ -41,7 +41,7 @@ export default function Auth({
         navigate("/");
         return res;
       } else {
-        const res = await api.post("/auth/register", formData);
+        const res = await api.post("/api/auth/register", formData);
         console.log("owner came: ", res?.data)
         localStorage.setItem("user", JSON.stringify(res?.data?.user));
         localStorage.setItem("token", res?.data?.token);
