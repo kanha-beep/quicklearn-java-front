@@ -3,13 +3,13 @@ import { api } from "../../api.js";
 import ClassHomeCard from "../Pages/ClassHomeCard.jsx";
 import { Loading } from "../Components/Loading.jsx";
 import { MainPageHeading } from "../Pages/MainPageHeading.jsx";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 
 export default function HomePage() {
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams();
   const [loading, setLoading] = useState(true);
   const [classes, setClasses] = useState([]);
-  const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
     const getAllClasses = async () => {
@@ -22,7 +22,7 @@ export default function HomePage() {
 
   if (loading) return <Loading loading={loading} />;
 
-  const normalizedQuery = searchQuery.trim().toLowerCase();
+  const normalizedQuery = (searchParams.get("q") || "").trim().toLowerCase();
   const filteredClasses = classes.filter((cl) => {
     const className = (cl?.class_name ?? "").toString().toLowerCase();
     const classOrder = (cl?.order ?? "").toString().toLowerCase();
@@ -35,20 +35,8 @@ export default function HomePage() {
   });
 
   return (
-    <div className="mx-auto w-full max-w-7xl p-2">
+    <div className="mx-auto w-full max-w-7xl px-3 py-3 sm:px-4">
       <MainPageHeading />
-
-      <section className="rounded-2xl border border-slate-200 bg-white p-3 shadow-sm w-[14rem]">
-        <div className="relative w-full">
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search class"
-            className="form-control py-2 text-xs"
-          />
-        </div>
-      </section>
 
       <div className="mt-6 flex items-center justify-between">
         <p className="text-sm font-medium text-slate-600">
@@ -56,9 +44,9 @@ export default function HomePage() {
         </p>
       </div>
 
-      <div className="row mt-4">
+      <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6">
         {filteredClasses.map((cl, index) => (
-          <div key={cl._id} className="col-md-2 col-2">
+          <div key={cl._id} className="min-w-0">
             <ClassHomeCard subject={cl} navigate={navigate} index={index} />
           </div>
         ))}

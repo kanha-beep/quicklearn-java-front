@@ -87,16 +87,16 @@ export default function Auth({
 
   return (
     <div
-      className="min-vh-100 d-flex align-items-center bg-gradient"
+      className="min-vh-100 d-flex align-items-center bg-gradient px-3 py-4"
       style={{
         background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
       }}
     >
       <div className="container">
         <div className="row justify-content-center">
-          <div className="col-md-6 col-lg-5">
+          <div className="col-12 col-md-8 col-lg-5">
             <div className="card shadow-lg border-0 rounded-4">
-              <div className="card-body p-5">
+              <div className="card-body p-4 p-sm-5">
                 <div className="text-center mb-4">
                   <i className="fas fa-plane text-primary fs-1 mb-3"></i>
                   <h2 className="fw-bold text-dark mb-2">Study App</h2>
@@ -123,7 +123,7 @@ export default function Auth({
                   </div>
                 )}
 
-                <div className="d-flex mb-4 bg-light rounded-3 p-1">
+                <div className="d-flex flex-column flex-sm-row mb-4 gap-1 rounded-3 bg-light p-1">
                   <button
                     type="button"
                     className={`btn flex-fill ${

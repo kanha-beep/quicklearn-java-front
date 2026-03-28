@@ -1,25 +1,25 @@
 import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import SubjectHomeCard from "../Subjects/SubjectHomeCard.jsx";
 import { Loading } from "../Components/Loading.jsx";
 import { useSubjects } from "../hooks.js";
 import { ArrowLeft } from "lucide-react";
 
 export default function SingleClassPage() {
-  const [searchSubject, setSearchSubject] = useState("");
   const { classId } = useParams();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [loading, setLoading] = useState(false);
   const subjects = useSubjects(classId);
   if (loading) return <Loading loading={loading} />;
 
-  const normalizedQuery = searchSubject.trim().toLowerCase();
+  const normalizedQuery = (searchParams.get("q") || "").trim().toLowerCase();
   const filterSubjects = subjects.filter((s) =>
     (s?.subject_name ?? "").toLowerCase().includes(normalizedQuery),
   );
 
   return (
-    <div className="mx-auto w-full max-w-7xl p-3 sm:p-5">
+    <div className="mx-auto w-full max-w-7xl px-3 py-3 sm:px-5 sm:py-5">
       <section className="rounded-3xl border border-slate-200 bg-gradient-to-br from-sky-50 via-white to-emerald-50 p-4 shadow-sm sm:p-6">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
@@ -36,15 +36,6 @@ export default function SingleClassPage() {
         </div>
 
         <div className="mt-4 flex flex-wrap items-center gap-3">
-          <div className="w-64 max-w-full">
-            <input
-              type="text"
-              value={searchSubject}
-              onChange={(e) => setSearchSubject(e.target.value)}
-              placeholder="Search subject"
-              className="form-control"
-            />
-          </div>
           <p className="text-sm font-medium text-slate-600">
             {filterSubjects.length} subject
             {filterSubjects.length !== 1 ? "s" : ""}
@@ -73,13 +64,15 @@ export default function SingleClassPage() {
         </div>
       )}
 
-      <button
-        onClick={() => navigate("/")}
-        className="mt-4 inline-flex items-center gap-2 rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100"
-      >
-        <ArrowLeft className="h-4 w-4" />
-        Go back to Classes
-      </button>
+      <div className="mt-4">
+        <button
+          onClick={() => navigate("/")}
+          className="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100 sm:w-auto"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          Go back to Classes
+        </button>
+      </div>
     </div>
   );
 }

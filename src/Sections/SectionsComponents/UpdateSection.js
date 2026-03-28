@@ -6,7 +6,8 @@ export const UpdateSection = async (e, api, subjectId, chapterId, sectionId, sec
             {
                 sectionName: sectionData.sectionName,
                 sectionContent: sectionData.sectionContent,
-                order
+                order,
+                subsections: sectionData.subsections || [],
             }
         );
         console.log("Section updated successfully: ", res?.data);

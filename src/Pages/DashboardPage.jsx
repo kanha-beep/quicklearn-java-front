@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { api } from "../../api.js";
 import { Loading } from "../Components/Loading.jsx";
-import { Plus, Search } from "lucide-react";
+import { Plus } from "lucide-react";
 
 export default function DashboardPage() {
   const navigate = useNavigate();
@@ -28,7 +28,7 @@ export default function DashboardPage() {
   });
 
   return (
-    <div className="mx-auto w-full max-w-7xl p-3 sm:p-5">
+    <div className="mx-auto w-full max-w-7xl px-3 py-3 sm:px-5 sm:py-5">
       <section className="rounded-3xl border border-slate-200 bg-gradient-to-br from-amber-50 via-white to-emerald-50 p-4 shadow-sm sm:p-6">
         <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
           Admin Dashboard
@@ -43,22 +43,11 @@ export default function DashboardPage() {
         <div className="mt-4 flex flex-wrap items-center gap-3">
           <button
             onClick={() => navigate("/add-class")}
-            className="inline-flex items-center gap-2 rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-slate-800"
+            className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-slate-800 sm:w-auto"
           >
             <Plus className="h-4 w-4" />
             Add Class
           </button>
-
-          {/* <div className="relative w-64 max-w-full">
-            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-            <input
-              type="text"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search class"
-              className="w-full rounded-xl border border-slate-200 bg-white py-2.5 pl-10 pr-3 text-sm text-slate-700 outline-none transition focus:border-emerald-400 focus:ring-2 focus:ring-emerald-100"
-            />
-          </div> */}
         </div>
       </section>
 
@@ -72,7 +61,7 @@ export default function DashboardPage() {
               {cl?.class_name}
             </h2>
             <p className="mt-1 text-xs text-slate-500">ID: {cl?._id}</p>
-            <div className="mt-3 flex gap-2">
+            <div className="mt-3 flex flex-col gap-2 sm:flex-row">
               <button
                 onClick={() => navigate(`/${cl._id}`)}
                 className="rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-700 transition hover:bg-slate-100"
