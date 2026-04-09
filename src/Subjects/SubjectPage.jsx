@@ -6,6 +6,7 @@ import { HomePageButton } from "../Pages/HomePageButton.jsx";
 import { EditSingleChapterButton } from "../Chapters/ChaptersButtons/EditSingleChapterButton.jsx";
 import { DeleteChapterButton } from "../Chapters/ChaptersButtons/DeleteChapterButton.jsx";
 import { AddSectionButton } from "../Sections/SectionsButtons/AddSectionButton.jsx";
+import { GoToAddChapterButton } from "../Chapters/ChaptersButtons/GoToAddChapterButton.jsx";
 import { EditSectionButton } from "../Sections/SectionsButtons/EditSectionButton.jsx";
 import { DeleteSectionButton } from "../Sections/SectionsButtons/DeleteSectionButton.jsx";
 import { DeleteSection } from "../Sections/SectionsComponents/DeleteSection.js";
@@ -256,7 +257,18 @@ export default function SubjectPage() {
     <div className="mx-auto w-full max-w-6xl px-1 pb-4 pt-3 text-slate-900">
       <section className={`grid gap-3 ${layoutClass}`}>
         <div className="rounded-2xl border border-slate-200 bg-white p-3 shadow-sm">
-          <div className="mb-3 text-sm font-semibold text-slate-700">Chapters</div>
+          <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
+            <div className="text-sm font-semibold text-slate-700">Chapters</div>
+            {isAdmin && (
+              <GoToAddChapterButton
+                navigate={navigate}
+                subjectId={subjectId}
+                classId={classId}
+                subjectName={subjectName}
+                className="w-full sm:w-auto"
+              />
+            )}
+          </div>
           <div className="max-h-[11rem] space-y-2 overflow-y-auto pr-1 lg:max-h-none lg:overflow-visible lg:pr-0">
             {filteredChapters.map((chapter) => {
               const isActive = activeChapterId === chapter._id;
