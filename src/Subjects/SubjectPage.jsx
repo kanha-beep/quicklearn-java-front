@@ -254,8 +254,8 @@ export default function SubjectPage() {
   };
 
   return (
-    <div className="mx-auto w-full max-w-6xl px-1 pb-4 pt-3 text-slate-900">
-      <section className={`grid gap-3 ${layoutClass}`}>
+    <div className="mx-auto w-full max-w-[95%] pb-4 pt-3 text-slate-900">
+      <section className={`grid gap-2 ${layoutClass}`}>
         <div className="rounded-2xl border border-slate-200 bg-white p-3 shadow-sm">
           <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
             <div className="text-sm font-semibold text-slate-700">Chapters</div>

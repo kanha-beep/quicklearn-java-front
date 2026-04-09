@@ -2,10 +2,10 @@ import { OpenChapterButton } from "../Pages/OpenChapterButton.jsx";
 import { GoToAddChapterButton } from "../Chapters/ChaptersButtons/GoToAddChapterButton.jsx";
 
 export default function SubjectHomeCard({ subject, navigate, classId }) {
-  const roles = localStorage.getItem("roles");
-  const storedUser = localStorage.getItem("user");
-  const userRole = storedUser ? JSON.parse(storedUser)?.roles : "";
-  const isAdmin = roles === "admin" || userRole === "admin";
+  // const roles = localStorage.getItem("roles");
+  // const storedUser = localStorage.getItem("user");
+  // const userRole = storedUser ? JSON.parse(storedUser)?.roles : "";
+  // const isAdmin = roles === "admin" || userRole === "admin";
 
   return (
     <div className="py-2">
@@ -23,7 +23,7 @@ export default function SubjectHomeCard({ subject, navigate, classId }) {
             classId={classId}
           />
         </div>
-        {isAdmin && (
+        {/* {isAdmin && (
           <div className="mt-3">
             <GoToAddChapterButton
               navigate={navigate}
@@ -33,7 +33,7 @@ export default function SubjectHomeCard({ subject, navigate, classId }) {
               className="w-full"
             />
           </div>
-        )}
+        )} */}
       </article>
     </div>
   );

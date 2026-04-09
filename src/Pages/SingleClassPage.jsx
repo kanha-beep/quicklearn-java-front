@@ -43,9 +43,9 @@ export default function SingleClassPage() {
         </div>
       </section>
 
-      <div className="row mt-4">
+      <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {filterSubjects.map((subject) => (
-          <div key={subject?._id} className="col-12 col-sm-6 col-lg-4 col-xl-3">
+          <div key={subject?._id} className="min-w-0">
             <SubjectHomeCard
               subject={subject}
               navigate={navigate}
