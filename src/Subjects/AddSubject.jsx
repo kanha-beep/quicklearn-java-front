@@ -6,14 +6,21 @@ export default function AddSubject() {
   const { classId } = useParams();
   const navigate = useNavigate();
   const [subjectName, setSubjectName] = useState("");
+  const [customSubjectName, setCustomSubjectName] = useState("");
   const [order, setOrder] = useState("");
   const addSubjectCalled = useAddSubject();
+  const isCustomSubject = subjectName === "__custom__";
 
   const handleAddSubject = async (e) => {
     e.preventDefault();
+    const finalSubjectName = isCustomSubject
+      ? customSubjectName.trim()
+      : subjectName.trim();
+
     try {
-      await addSubjectCalled(classId, subjectName, order);
+      await addSubjectCalled(classId, finalSubjectName, order);
       setSubjectName("");
+      setCustomSubjectName("");
       setOrder("");
       return navigate(`/${classId}`);
     } catch (error) {
@@ -46,6 +53,7 @@ export default function AddSubject() {
               className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-800 outline-none transition focus:border-cyan-400 focus:ring-2 focus:ring-cyan-100"
               onChange={(e) => setSubjectName(e.target.value)}
               value={subjectName}
+              required
             >
               <option value="">Select Subject</option>
               <option value="english">English</option>
@@ -60,8 +68,25 @@ export default function AddSubject() {
               <option value="economy">Economics</option>
               <option value="arts">Arts</option>
               <option value="music">Music</option>
+              <option value="__custom__">Write your own</option>
             </select>
           </div>
+
+          {isCustomSubject && (
+            <div>
+              <label className="mb-2 block text-sm font-semibold text-slate-700">
+                Custom Subject
+              </label>
+              <input
+                type="text"
+                placeholder="Enter subject name"
+                value={customSubjectName}
+                onChange={(e) => setCustomSubjectName(e.target.value)}
+                className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-800 outline-none transition focus:border-cyan-400 focus:ring-2 focus:ring-cyan-100"
+                required
+              />
+            </div>
+          )}
 
           <div>
             <label className="mb-2 block text-sm font-semibold text-slate-700">
