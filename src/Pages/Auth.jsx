@@ -23,6 +23,7 @@ export default function Auth({
   const role = location?.state;
   const navigate = useNavigate();
   const [isLogin, setIsLogin] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -70,6 +71,9 @@ export default function Auth({
 
   const submitAuth = async (e) => {
     e.preventDefault();
+    if (isSubmitting) return;
+
+    setIsSubmitting(true);
 
     try {
       if (role === "owner") {
@@ -80,6 +84,8 @@ export default function Auth({
     } catch (error) {
       setMsg(error?.response?.data?.msg || error?.message || "Authentication failed");
       setMsgType("danger");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -208,6 +214,7 @@ export default function Auth({
 
                   <button
                     type="submit"
+                    disabled={isSubmitting}
                     className="btn btn-primary btn-lg w-100 rounded-3 mb-3"
                   >
                     <i
@@ -215,7 +222,13 @@ export default function Auth({
                         isLogin ? "fa-sign-in-alt" : "fa-user-plus"
                       } me-2`}
                     ></i>
-                    {isLogin ? "Login" : "Register"}
+                    {isSubmitting
+                      ? isLogin
+                        ? "Login..."
+                        : "Register..."
+                      : isLogin
+                        ? "Login"
+                        : "Register"}
                   </button>
 
                   <div className="text-center">
