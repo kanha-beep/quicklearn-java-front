@@ -28,18 +28,94 @@ const toContentArray = (content = "") =>
     .map((item) => item.trim())
     .filter(Boolean);
 
-const renderContent = (content = []) => {
+const escapeHtml = (value = "") =>
+  String(value)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+
+const getContentItems = (content = []) => {
   if (Array.isArray(content)) {
-    return content
-      .map((item) => String(item).trim())
-      .filter(Boolean)
-      .join("<br/><br/>");
+    return content.map((item) => String(item).trim()).filter(Boolean);
   }
 
   return String(content || "")
-    .split(/\n|\./)
+    .split(/\r?\n/)
     .map((item) => item.trim())
-    .filter(Boolean)
+    .filter(Boolean);
+};
+
+const isAllowedYoutubeEmbed = (value = "") =>
+  /^<iframe[\s\S]*src=["']https:\/\/(?:www\.)?(?:youtube\.com\/embed\/|youtube-nocookie\.com\/embed\/)[^"']+["'][\s\S]*<\/iframe>$/.test(
+    String(value).trim(),
+  );
+
+const isAllowedVideoTag = (value = "") => {
+  const trimmed = String(value).trim();
+  return (
+    /^<video[\s\S]*<\/video>$/.test(trimmed) &&
+    /src=["']https?:\/\/[^"']+["']/.test(trimmed)
+  );
+};
+
+const getYoutubeEmbedUrl = (value = "") => {
+  const trimmed = String(value).trim();
+
+  const shortMatch = trimmed.match(
+    /^https?:\/\/(?:www\.)?youtu\.be\/([a-zA-Z0-9_-]{11})(?:\?.*)?$/i,
+  );
+  if (shortMatch) {
+    return `https://www.youtube.com/embed/${shortMatch[1]}`;
+  }
+
+  const watchMatch = trimmed.match(
+    /^https?:\/\/(?:www\.)?youtube\.com\/watch\?(?:.*&)?v=([a-zA-Z0-9_-]{11})(?:[&#?].*)?$/i,
+  );
+  if (watchMatch) {
+    return `https://www.youtube.com/embed/${watchMatch[1]}`;
+  }
+
+  const embedMatch = trimmed.match(
+    /^https?:\/\/(?:www\.)?youtube(?:-nocookie)?\.com\/embed\/([a-zA-Z0-9_-]{11})(?:\?.*)?$/i,
+  );
+  if (embedMatch) {
+    return `https://www.youtube.com/embed/${embedMatch[1]}`;
+  }
+
+  return "";
+};
+
+const createYoutubeIframe = (src) =>
+  `<iframe width="320" height="350" src="${src}" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>`;
+
+const renderContent = (content = []) => {
+  const items = getContentItems(content);
+
+  const wholeYoutubeUrl = getYoutubeEmbedUrl(items.join(" "));
+  if (wholeYoutubeUrl) {
+    return createYoutubeIframe(wholeYoutubeUrl);
+  }
+
+  const legacyJoinedYoutubeUrl = getYoutubeEmbedUrl(items.join("."));
+  if (legacyJoinedYoutubeUrl) {
+    return createYoutubeIframe(legacyJoinedYoutubeUrl);
+  }
+
+  return items
+    .map((item) => {
+      const youtubeEmbedUrl = getYoutubeEmbedUrl(item);
+      if (youtubeEmbedUrl) {
+        return createYoutubeIframe(youtubeEmbedUrl);
+      }
+
+      if (isAllowedYoutubeEmbed(item) || isAllowedVideoTag(item)) {
+        return item;
+      }
+
+      return escapeHtml(item);
+    })
     .join("<br/><br/>");
 };
 
