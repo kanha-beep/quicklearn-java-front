@@ -1,16 +1,24 @@
 import axios from "axios";
 import { clearAuthSession, getStoredToken } from "./src/auth.js";
 
-const baseURL = import.meta.env.VITE_API_URL || "http://localhost:3000";
+const configuredJavaApiUrl =
+  import.meta.env.VITE_JAVA_API_URL || import.meta.env.VITE_API_URL;
+
+// In local dev, use the Vite proxy so every frontend API call stays pinned to the Java server.
+const baseURL = configuredJavaApiUrl || (import.meta.env.DEV ? "/" : "http://localhost:3000");
 
 export const api = axios.create({
   baseURL,
   timeout: 15000,
+  withCredentials: true,
 });
 
 api.interceptors.request.use((config) => {
+  const requestPath = String(config.url || "");
+  const isPublicAuthRequest =
+    requestPath === "/api/auth/login" || requestPath === "/api/auth/register";
   const token = getStoredToken();
-  if (token) {
+  if (token && !isPublicAuthRequest) {
     config.headers.Authorization = `Bearer ${token}`;
   }
 
@@ -41,7 +49,7 @@ export const deleteChapterRoute = (subjectId, chapterId) => api.delete(`/api/sub
 export const addSectionRoute = (subjectId, chapterId, sections) => api.post(`/api/subjects/${subjectId}/chapters/${chapterId}/sections/add-section`, sections)
 export const sectionRoute = (subjectId, chapterId) => api.get(`/api/subjects/${subjectId}/chapters/${chapterId}/sections`)
 export const singleSectionRoute = (subjectId, chapterId, sectionId) => api.get(`/api/subjects/${subjectId}/chapters/${chapterId}/sections/${sectionId}`)
-export const editSectionRoute = (subjectId, chapterId, sectionId) => api.get(`/api/subjects/${subjectId}/chapters/${chapterId}/sections/${sectionId}/edit`)
+export const editSectionRoute = (subjectId, chapterId, sectionId) => api.get(`/api/subjects/${subjectId}/chapters/${chapterId}/sections/${sectionId}`)
 export const updateSectionRoute = (subjectId, chapterId, sectionId, sectionData, order) => api.patch(`/api/subjects/${subjectId}/chapters/${chapterId}/sections/${sectionId}/edit`, {
   sectionName: sectionData.sectionName,
   sectionContent: sectionData.sectionContent,
