@@ -1,19 +1,30 @@
-# React + Vite
+# QuickLearn Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+React + Vite client for the study platform.
 
-Currently, two official plugins are available:
+## API Target
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+The frontend is intended to call the dedicated Java backend in `../java-server`.
 
-## React Compiler
+Set:
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+```bash
+VITE_JAVA_API_URL=http://localhost:3000
+```
 
-## Expanding the ESLint configuration
+All app requests use `api.js`, which forwards:
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
-"# QuickLearn-Frontend" 
-"# Discussion-Frontend" 
-"# Discussion-Frontend" 
+- auth routes
+- class, subject, chapter, and section routes
+- dashboard/report routes
+- contact routes
+
+## Run
+
+```bash
+npm install
+npm run dev
+```
+
+Start the Java backend before opening the app. In local development, if no API URL is set, the client falls back to the Vite `/api` proxy which targets `http://localhost:3000`.
+"# quicklearn-java-front" 
