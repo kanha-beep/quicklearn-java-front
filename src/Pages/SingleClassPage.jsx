@@ -26,7 +26,15 @@ export default function SingleClassPage() {
     setSubjectList(subjects);
   }, [subjects]);
 
-  if (isLoading) return <Loading loading={isLoading} />;
+  if (isLoading) {
+    return (
+      <Loading
+        loading={isLoading}
+        message="Loading subjects"
+        detail="We’re bringing together the subjects available in this class."
+      />
+    );
+  }
 
   const normalizedQuery = (searchParams.get("q") || "").trim().toLowerCase();
   const sourceSubjects = subjectList.length ? subjectList : subjects;

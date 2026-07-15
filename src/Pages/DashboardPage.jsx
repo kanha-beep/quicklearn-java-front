@@ -457,7 +457,15 @@ export default function DashboardPage({ userRoles = "" }) {
     }
   };
 
-  if (loading) return <Loading loading={loading} />;
+  if (loading) {
+    return (
+      <Loading
+        loading={loading}
+        message="Loading dashboard"
+        detail="We’re collecting analytics, study progress, and class insights for you."
+      />
+    );
+  }
 
   return (
     <div className="mx-auto w-full max-w-7xl px-3 py-3 sm:px-5 sm:py-5">

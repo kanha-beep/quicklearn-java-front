@@ -168,7 +168,6 @@ export default function SubjectPage() {
         (subsection._id || `${selectedSection?._id}-${index}`) === activeSubsectionId,
     ) || null;
   const hasSubsections = sectionSubsections.length > 0;
-  const isPageLoading = isChaptersLoading || isSectionsLoading;
   const layoutClass = "grid-cols-2 lg:grid-cols-4";
   const actionRowClass = "mt-2 flex flex-wrap items-center gap-2";
 
@@ -292,8 +291,14 @@ export default function SubjectPage() {
     }
   };
 
-  if (isPageLoading) {
-    return <Loading loading />;
+  if (isChaptersLoading) {
+    return (
+      <Loading
+        loading
+        message="Loading chapters"
+        detail="We’re arranging the chapter flow and section content for this subject."
+      />
+    );
   }
 
   return (
@@ -377,6 +382,11 @@ export default function SubjectPage() {
         <div className="rounded-2xl border border-slate-200 bg-white p-3 shadow-sm">
           <div className="mb-3 text-sm font-semibold text-slate-700">Sections</div>
           <div className="max-h-[11rem] space-y-2 overflow-y-auto pr-1 lg:max-h-none lg:overflow-visible lg:pr-0">
+            {isSectionsLoading && activeChapterId && (
+              <div className="rounded-xl border border-dashed border-slate-200 bg-slate-50 px-3 py-4 text-sm text-slate-500">
+                Loading sections...
+              </div>
+            )}
             {visibleSections.map((section) => {
               const isActive = activeSectionId === section._id;
               return (

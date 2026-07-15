@@ -26,7 +26,15 @@ export default function HomePage() {
     getAllClasses();
   }, []);
 
-  if (loading) return <Loading loading={loading} />;
+  if (loading) {
+    return (
+      <Loading
+        loading={loading}
+        message="Loading classes"
+        detail="We’re organizing your available classes and latest updates."
+      />
+    );
+  }
 
   const normalizedQuery = (searchParams.get("q") || "").trim().toLowerCase();
   const filteredClasses = classes.filter((cl) => {

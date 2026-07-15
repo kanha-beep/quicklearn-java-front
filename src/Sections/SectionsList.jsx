@@ -45,7 +45,13 @@ export default function SectionsList({
   const { sections: allSections, isLoading } = useSections(subjectId, chapterId);
 
   if (isLoading) {
-    return <Loading loading />;
+    return (
+      <Loading
+        loading
+        message="Loading sections"
+        detail="We’re preparing the section list for the selected chapter."
+      />
+    );
   }
 
   return (

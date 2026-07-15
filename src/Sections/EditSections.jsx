@@ -4,6 +4,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { handleChange } from "../Components/HandleChange.js";
 import { UpdateSection } from "./SectionsComponents/UpdateSection.js";
 import { GetSection } from "./SectionsComponents/GetSection.js";
+import { Loading } from "../Components/Loading.jsx";
 
 const createEmptySubsection = (order = "") => ({
   subsection_name: "",
@@ -14,6 +15,7 @@ const createEmptySubsection = (order = "") => ({
 export default function EditSections() {
   const [order, setOrder] = React.useState();
   const [isSaving, setIsSaving] = React.useState(false);
+  const [isLoading, setIsLoading] = React.useState(true);
   const navigate = useNavigate();
   const { subjectId, chapterId, sectionId, classId } = useParams();
   console.log("EditSections props: ", subjectId, chapterId, sectionId);
@@ -24,7 +26,9 @@ export default function EditSections() {
   });
   useEffect(() => {
     const getSectionData = async () => {
-      GetSection(api, subjectId, chapterId, sectionId, setSectionData, setOrder);
+      setIsLoading(true);
+      await GetSection(api, subjectId, chapterId, sectionId, setSectionData, setOrder);
+      setIsLoading(false);
     };
     getSectionData();
   }, [chapterId, sectionId, subjectId]);
@@ -75,6 +79,16 @@ export default function EditSections() {
       subsections: prev.subsections.filter((_, index) => index !== indexToDelete),
     }));
   };
+
+  if (isLoading) {
+    return (
+      <Loading
+        loading
+        message="Loading section details"
+        detail="We’re fetching the section content and subsections so you can edit them safely."
+      />
+    );
+  }
 
   return (
     <div className="container px-3 py-4 py-md-5 px-sm-4">
