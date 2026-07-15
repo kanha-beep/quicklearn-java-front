@@ -36,10 +36,18 @@ api.interceptors.response.use(
   },
 );
 //class
+export const updateClassRoute = (classId, className, order) =>
+  api.patch(`/api/class/${classId}/edit`, { className, order });
+export const deleteClassRoute = (classId) =>
+  api.delete(`/api/class/${classId}/delete`);
 //subjects //
 export const addSubjectRoute = (classId, subjectName, order) => api.post(`/api/subjects/${classId}/add-subjects`, {
   subjectName, order,
 });
+export const updateSubjectRoute = (subjectId, subjectName, order) =>
+  api.patch(`/api/subjects/${subjectId}/edit`, { subjectName, order });
+export const deleteSubjectRoute = (subjectId) =>
+  api.delete(`/api/subjects/${subjectId}/delete`);
 export const subjectRoute = (classId) => api.get(`/api/subjects?classId=${classId}`)
 //chapters
 export const addChapterRoute = (subjectId) => api.post(`/api/subjects/${subjectId}/chapters/add-chapters`)

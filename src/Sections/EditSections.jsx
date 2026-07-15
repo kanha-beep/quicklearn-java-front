@@ -13,6 +13,7 @@ const createEmptySubsection = (order = "") => ({
 
 export default function EditSections() {
   const [order, setOrder] = React.useState();
+  const [isSaving, setIsSaving] = React.useState(false);
   const navigate = useNavigate();
   const { subjectId, chapterId, sectionId, classId } = useParams();
   console.log("EditSections props: ", subjectId, chapterId, sectionId);
@@ -28,7 +29,10 @@ export default function EditSections() {
     getSectionData();
   }, [chapterId, sectionId, subjectId]);
   const handleContentUpdate = async (e) => {
-    UpdateSection(
+    if (isSaving) return;
+
+    setIsSaving(true);
+    await UpdateSection(
       e,
       api,
       subjectId,
@@ -39,6 +43,7 @@ export default function EditSections() {
       classId,
       order
     );
+    setIsSaving(false);
     console.log("section updated");
   };
 
@@ -208,7 +213,8 @@ export default function EditSections() {
                     <button
                       type="button"
                       onClick={() => handleRemoveSubsection(index)}
-                      className="btn btn-sm btn-outline-danger"
+                      disabled={isSaving}
+                      className="btn btn-sm btn-outline-danger disabled:opacity-70"
                     >
                       Remove
                     </button>
@@ -219,7 +225,13 @@ export default function EditSections() {
           </div>
 
           <div className="d-flex flex-wrap gap-2">
-            <button className="btn btn-success w-full px-4 sm:w-auto">Save</button>
+            <button
+              type="submit"
+              disabled={isSaving}
+              className="btn btn-success w-full px-4 disabled:opacity-70 sm:w-auto"
+            >
+              {isSaving ? "Saving..." : "Save"}
+            </button>
           </div>
         </form>
       </div>

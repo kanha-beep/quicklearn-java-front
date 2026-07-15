@@ -27,6 +27,7 @@ export default function AddSections() {
   const whatToAdd = location.state?.addButton || "";
   const [sections, setSections] = useState(emptySectionForm);
   const [subsectionDraft, setSubsectionDraft] = useState(emptySubsectionDraft);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   console.log(
     "chapterId",
     chapterId,
@@ -48,7 +49,10 @@ export default function AddSections() {
 
   const handleAddSections = async (e) => {
     console.log("section adding started from page: ", sections);
-    AddSection(
+    if (isSubmitting) return;
+
+    setIsSubmitting(true);
+    await AddSection(
       e,
       sections,
       api,
@@ -58,6 +62,7 @@ export default function AddSections() {
       navigate,
       classId
     );
+    setIsSubmitting(false);
     console.log("section added ended on section add page");
   };
 
@@ -216,9 +221,9 @@ export default function AddSections() {
             </div>
 
             <div className="d-flex flex-wrap gap-2 mt-3">
-              <button
-                type="button"
-                onClick={handleAddSubsection}
+            <button
+              type="button"
+              onClick={handleAddSubsection}
                 className="btn btn-outline-primary w-full sm:w-auto"
               >
                 Add Subsection
@@ -261,8 +266,12 @@ export default function AddSections() {
           </div>
 
           <div className="d-flex flex-wrap gap-2">
-            <button type="submit" className="btn btn-primary w-full px-4 sm:w-auto">
-              Add Section
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className="btn btn-primary w-full px-4 disabled:opacity-75 sm:w-auto"
+            >
+              {isSubmitting ? "Adding Section..." : "Add Section"}
             </button>
           </div>
         </form>

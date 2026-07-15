@@ -3,20 +3,102 @@ import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import SubjectHomeCard from "../Subjects/SubjectHomeCard.jsx";
 import { Loading } from "../Components/Loading.jsx";
 import { useSubjects } from "../hooks.js";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, X } from "lucide-react";
+import { api } from "../../api.js";
+import { getStoredRole, getStoredUser } from "../auth.js";
 
 export default function SingleClassPage() {
   const { classId } = useParams();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const [loading, setLoading] = useState(false);
-  const subjects = useSubjects(classId);
-  if (loading) return <Loading loading={loading} />;
+  const { subjects, isLoading } = useSubjects(classId);
+  const [editingSubject, setEditingSubject] = useState(null);
+  const [subjectForm, setSubjectForm] = useState({ subjectName: "", order: "" });
+  const [isSavingSubject, setIsSavingSubject] = useState(false);
+  const [deletingSubjectId, setDeletingSubjectId] = useState("");
+  const [subjectList, setSubjectList] = useState([]);
+  const storedRole = getStoredRole();
+  const storedUser = getStoredUser();
+  const userRole = storedUser?.roles || "";
+  const isAdmin = storedRole === "admin" || userRole === "admin";
+
+  useEffect(() => {
+    setSubjectList(subjects);
+  }, [subjects]);
+
+  if (isLoading) return <Loading loading={isLoading} />;
 
   const normalizedQuery = (searchParams.get("q") || "").trim().toLowerCase();
-  const filterSubjects = subjects.filter((s) =>
+  const sourceSubjects = subjectList.length ? subjectList : subjects;
+  const filterSubjects = sourceSubjects.filter((s) =>
     (s?.subject_name ?? "").toLowerCase().includes(normalizedQuery),
   );
+
+  const openEditSubjectModal = (subject) => {
+    setEditingSubject(subject);
+    setSubjectForm({
+      subjectName: subject?.subject_name || "",
+      order: subject?.order ?? "",
+    });
+  };
+
+  const closeEditSubjectModal = () => {
+    if (isSavingSubject) return;
+    setEditingSubject(null);
+    setSubjectForm({ subjectName: "", order: "" });
+  };
+
+  const handleEditSubjectSubmit = async (event) => {
+    event.preventDefault();
+    if (!editingSubject || isSavingSubject) return;
+
+    const subjectName = subjectForm.subjectName.trim();
+    if (!subjectName) {
+      window.alert("Subject name is required");
+      return;
+    }
+
+    setIsSavingSubject(true);
+    try {
+      const response = await api.patch(`/api/subjects/${editingSubject._id}/edit`, {
+        subjectName,
+        order: subjectForm.order,
+      });
+      const updatedSubject = response?.data?.updatedSubject;
+      setSubjectList((prevSubjects) =>
+        (prevSubjects.length ? prevSubjects : subjects)
+          .map((item) => (item._id === editingSubject._id ? updatedSubject : item))
+          .sort(
+            (a, b) =>
+              (a.order ?? 0) - (b.order ?? 0) ||
+              String(a.subject_name).localeCompare(String(b.subject_name)),
+          ),
+      );
+      closeEditSubjectModal();
+    } catch (error) {
+      window.alert(error?.response?.data?.msg || "Failed to update subject");
+    } finally {
+      setIsSavingSubject(false);
+    }
+  };
+
+  const handleDeleteSubject = async (subject) => {
+    if (!subject?._id || deletingSubjectId) return;
+    const confirmed = window.confirm(`Delete "${subject.subject_name}"?`);
+    if (!confirmed) return;
+
+    setDeletingSubjectId(subject._id);
+    try {
+      await api.delete(`/api/subjects/${subject._id}/delete`);
+      setSubjectList((prevSubjects) =>
+        (prevSubjects.length ? prevSubjects : subjects).filter((item) => item._id !== subject._id),
+      );
+    } catch (error) {
+      window.alert(error?.response?.data?.msg || "Failed to delete subject");
+    } finally {
+      setDeletingSubjectId("");
+    }
+  };
 
   return (
     <div className="mx-auto w-full max-w-7xl px-3 py-3 sm:px-5 sm:py-5">
@@ -50,6 +132,10 @@ export default function SingleClassPage() {
               subject={subject}
               navigate={navigate}
               classId={classId}
+              isAdmin={isAdmin}
+              onEditSubject={openEditSubjectModal}
+              onDeleteSubject={handleDeleteSubject}
+              deletingSubjectId={deletingSubjectId}
             />
           </div>
         ))}
@@ -73,6 +159,80 @@ export default function SingleClassPage() {
           Go back to Classes
         </button>
       </div>
+
+      {editingSubject && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 px-4">
+          <div className="w-full max-w-lg rounded-3xl border border-slate-200 bg-white p-5 shadow-2xl">
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">
+                  Subject Management
+                </p>
+                <h2 className="mt-2 text-2xl font-bold text-slate-900">Edit Subject</h2>
+                <p className="mt-1 text-sm text-slate-500">
+                  Update the subject name and display order.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={closeEditSubjectModal}
+                disabled={isSavingSubject}
+                className="rounded-full border border-slate-200 p-2 text-slate-500 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+
+            <form onSubmit={handleEditSubjectSubmit} className="mt-5 space-y-4">
+              <div>
+                <label className="mb-2 block text-sm font-semibold text-slate-700">
+                  Subject Name
+                </label>
+                <input
+                  type="text"
+                  value={subjectForm.subjectName}
+                  onChange={(event) =>
+                    setSubjectForm((prev) => ({ ...prev, subjectName: event.target.value }))
+                  }
+                  className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-800 outline-none transition focus:border-amber-400 focus:ring-2 focus:ring-amber-100"
+                />
+              </div>
+
+              <div>
+                <label className="mb-2 block text-sm font-semibold text-slate-700">
+                  Order
+                </label>
+                <input
+                  type="number"
+                  value={subjectForm.order}
+                  onChange={(event) =>
+                    setSubjectForm((prev) => ({ ...prev, order: event.target.value }))
+                  }
+                  className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-800 outline-none transition focus:border-amber-400 focus:ring-2 focus:ring-amber-100"
+                />
+              </div>
+
+              <div className="flex flex-col gap-3 pt-2 sm:flex-row sm:justify-end">
+                <button
+                  type="button"
+                  onClick={closeEditSubjectModal}
+                  disabled={isSavingSubject}
+                  className="rounded-2xl border border-slate-200 px-4 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={isSavingSubject}
+                  className="rounded-2xl bg-slate-900 px-4 py-3 text-sm font-semibold text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-70"
+                >
+                  {isSavingSubject ? "Saving..." : "Save Changes"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

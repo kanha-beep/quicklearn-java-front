@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { api } from "../../api.js";
 import { Loading } from "../Components/Loading.jsx";
-import { Download, Flame, Plus, Sparkles, Target, TrendingUp } from "lucide-react";
+import { Download, Flame, Pencil, Plus, Sparkles, Target, Trash2, TrendingUp, X } from "lucide-react";
 
 const metricCardClass =
   "rounded-3xl border border-slate-200 bg-white/90 p-4 shadow-sm backdrop-blur";
@@ -161,7 +161,14 @@ function StudentDashboard({ dashboard }) {
   );
 }
 
-function AdminDashboard({ analytics, classes, navigate }) {
+function AdminDashboard({
+  analytics,
+  classes,
+  navigate,
+  onEditClass,
+  onDeleteClass,
+  deletingClassId,
+}) {
   const overview = analytics?.overview || {};
   const chapterPerformance = analytics?.chapterPerformance || [];
   const studentSnapshots = analytics?.studentSnapshots || [];
@@ -306,7 +313,7 @@ function AdminDashboard({ analytics, classes, navigate }) {
             >
               <h3 className="text-lg font-semibold text-slate-900">{cl?.class_name}</h3>
               <p className="mt-1 text-xs text-slate-500">ID: {cl?._id}</p>
-              <div className="mt-3 flex flex-col gap-2 sm:flex-row">
+              <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:flex-wrap">
                 <button
                   onClick={() => navigate(`/${cl._id}`)}
                   className="rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-700 transition hover:bg-white"
@@ -318,6 +325,23 @@ function AdminDashboard({ analytics, classes, navigate }) {
                   className="rounded-lg border border-blue-200 px-3 py-2 text-sm text-blue-700 transition hover:bg-blue-50"
                 >
                   Add Subject
+                </button>
+                <button
+                  type="button"
+                  onClick={() => onEditClass(cl)}
+                  className="inline-flex items-center justify-center gap-2 rounded-lg border border-amber-200 px-3 py-2 text-sm text-amber-700 transition hover:bg-amber-50"
+                >
+                  <Pencil className="h-4 w-4" />
+                  Edit
+                </button>
+                <button
+                  type="button"
+                  disabled={deletingClassId === cl._id}
+                  onClick={() => onDeleteClass(cl)}
+                  className="inline-flex items-center justify-center gap-2 rounded-lg border border-rose-200 px-3 py-2 text-sm text-rose-700 transition hover:bg-rose-50 disabled:cursor-not-allowed disabled:opacity-70"
+                >
+                  <Trash2 className="h-4 w-4" />
+                  {deletingClassId === cl._id ? "Deleting..." : "Delete"}
                 </button>
               </div>
             </article>
@@ -334,6 +358,10 @@ export default function DashboardPage({ userRoles = "" }) {
   const [classes, setClasses] = useState([]);
   const [studentDashboard, setStudentDashboard] = useState(null);
   const [teacherAnalytics, setTeacherAnalytics] = useState(null);
+  const [editingClass, setEditingClass] = useState(null);
+  const [classForm, setClassForm] = useState({ className: "", order: "" });
+  const [isSavingClass, setIsSavingClass] = useState(false);
+  const [deletingClassId, setDeletingClassId] = useState("");
   const isAdmin = userRoles === "admin";
 
   useEffect(() => {
@@ -364,14 +392,160 @@ export default function DashboardPage({ userRoles = "" }) {
     loadDashboard();
   }, [isAdmin]);
 
+  const openEditClassModal = (classRoom) => {
+    setEditingClass(classRoom);
+    setClassForm({
+      className: classRoom?.class_name || "",
+      order: classRoom?.order ?? "",
+    });
+  };
+
+  const closeEditClassModal = () => {
+    if (isSavingClass) return;
+    setEditingClass(null);
+    setClassForm({ className: "", order: "" });
+  };
+
+  const handleEditClassSubmit = async (event) => {
+    event.preventDefault();
+    if (!editingClass || isSavingClass) return;
+
+    const className = classForm.className.trim();
+    if (!className) {
+      window.alert("Class name is required");
+      return;
+    }
+
+    setIsSavingClass(true);
+    try {
+      const response = await api.patch(`/api/class/${editingClass._id}/edit`, {
+        className,
+        order: classForm.order,
+      });
+      const updatedClass = response?.data?.updatedClass;
+      setClasses((prevClasses) =>
+        prevClasses
+          .map((item) => (item._id === editingClass._id ? updatedClass : item))
+          .sort(
+            (a, b) =>
+              (a.order ?? 0) - (b.order ?? 0) ||
+              String(a.class_name).localeCompare(String(b.class_name)),
+          ),
+      );
+      closeEditClassModal();
+    } catch (error) {
+      window.alert(error?.response?.data?.msg || "Failed to update class");
+    } finally {
+      setIsSavingClass(false);
+    }
+  };
+
+  const handleDeleteClass = async (classRoom) => {
+    if (!classRoom?._id || deletingClassId) return;
+
+    const confirmed = window.confirm(`Delete "${classRoom.class_name}"?`);
+    if (!confirmed) return;
+
+    setDeletingClassId(classRoom._id);
+    try {
+      await api.delete(`/api/class/${classRoom._id}/delete`);
+      setClasses((prevClasses) => prevClasses.filter((item) => item._id !== classRoom._id));
+    } catch (error) {
+      window.alert(error?.response?.data?.msg || "Failed to delete class");
+    } finally {
+      setDeletingClassId("");
+    }
+  };
+
   if (loading) return <Loading loading={loading} />;
 
   return (
     <div className="mx-auto w-full max-w-7xl px-3 py-3 sm:px-5 sm:py-5">
       {isAdmin ? (
-        <AdminDashboard analytics={teacherAnalytics} classes={classes} navigate={navigate} />
+        <AdminDashboard
+          analytics={teacherAnalytics}
+          classes={classes}
+          navigate={navigate}
+          onEditClass={openEditClassModal}
+          onDeleteClass={handleDeleteClass}
+          deletingClassId={deletingClassId}
+        />
       ) : (
         <StudentDashboard dashboard={studentDashboard} />
+      )}
+
+      {editingClass && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 px-4">
+          <div className="w-full max-w-lg rounded-3xl border border-slate-200 bg-white p-5 shadow-2xl">
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">
+                  Class Management
+                </p>
+                <h2 className="mt-2 text-2xl font-bold text-slate-900">Edit Class</h2>
+                <p className="mt-1 text-sm text-slate-500">
+                  Update the class name and display order.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={closeEditClassModal}
+                disabled={isSavingClass}
+                className="rounded-full border border-slate-200 p-2 text-slate-500 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+
+            <form onSubmit={handleEditClassSubmit} className="mt-5 space-y-4">
+              <div>
+                <label className="mb-2 block text-sm font-semibold text-slate-700">
+                  Class Name
+                </label>
+                <input
+                  type="text"
+                  value={classForm.className}
+                  onChange={(event) =>
+                    setClassForm((prev) => ({ ...prev, className: event.target.value }))
+                  }
+                  className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-800 outline-none transition focus:border-amber-400 focus:ring-2 focus:ring-amber-100"
+                />
+              </div>
+
+              <div>
+                <label className="mb-2 block text-sm font-semibold text-slate-700">
+                  Order
+                </label>
+                <input
+                  type="number"
+                  value={classForm.order}
+                  onChange={(event) =>
+                    setClassForm((prev) => ({ ...prev, order: event.target.value }))
+                  }
+                  className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-800 outline-none transition focus:border-amber-400 focus:ring-2 focus:ring-amber-100"
+                />
+              </div>
+
+              <div className="flex flex-col gap-3 pt-2 sm:flex-row sm:justify-end">
+                <button
+                  type="button"
+                  onClick={closeEditClassModal}
+                  disabled={isSavingClass}
+                  className="rounded-2xl border border-slate-200 px-4 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={isSavingClass}
+                  className="rounded-2xl bg-slate-900 px-4 py-3 text-sm font-semibold text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-70"
+                >
+                  {isSavingClass ? "Saving..." : "Save Changes"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
       )}
     </div>
   );

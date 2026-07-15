@@ -3,6 +3,7 @@ import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { api } from "../../api.js";
 import { useChapters, useSections } from "../hooks.js";
 import { HomePageButton } from "../Pages/HomePageButton.jsx";
+import { Loading } from "../Components/Loading.jsx";
 import { EditSingleChapterButton } from "../Chapters/ChaptersButtons/EditSingleChapterButton.jsx";
 import { DeleteChapterButton } from "../Chapters/ChaptersButtons/DeleteChapterButton.jsx";
 import { AddSectionButton } from "../Sections/SectionsButtons/AddSectionButton.jsx";
@@ -60,7 +61,7 @@ export default function SubjectPage() {
   });
   const [isSavingSubsection, setIsSavingSubsection] = useState(false);
 
-  const { chaptersList, chaptersCount, subjectName } = useChapters(subjectId);
+  const { chaptersList, chaptersCount, subjectName, isLoading: isChaptersLoading } = useChapters(subjectId);
   const storedRole = localStorage.getItem("roles");
   const storedUser = localStorage.getItem("user");
   const userRole = storedUser ? JSON.parse(storedUser)?.roles : "";
@@ -68,7 +69,18 @@ export default function SubjectPage() {
   const query = (searchParams.get("q") || "").trim().toLowerCase();
 
   useEffect(() => {
-    setEditableChapters(chaptersList);
+    setEditableChapters((prevChapters) => {
+      if (prevChapters === chaptersList) {
+        return prevChapters;
+      }
+
+      const hasSameLength = prevChapters.length === chaptersList.length;
+      const hasSameIds =
+        hasSameLength &&
+        prevChapters.every((chapter, index) => chapter?._id === chaptersList[index]?._id);
+
+      return hasSameIds ? prevChapters : chaptersList;
+    });
   }, [chaptersList]);
 
   const filteredChapters = editableChapters.filter((chapter) =>
@@ -90,9 +102,20 @@ export default function SubjectPage() {
     }
   }, [filteredChapters, activeChapterId]);
 
-  const sections = useSections(subjectId, activeChapterId);
+  const { sections, isLoading: isSectionsLoading } = useSections(subjectId, activeChapterId);
   useEffect(() => {
-    setEditableSections(sections);
+    setEditableSections((prevSections) => {
+      if (prevSections === sections) {
+        return prevSections;
+      }
+
+      const hasSameLength = prevSections.length === sections.length;
+      const hasSameIds =
+        hasSameLength &&
+        prevSections.every((section, index) => section?._id === sections[index]?._id);
+
+      return hasSameIds ? prevSections : sections;
+    });
   }, [sections]);
 
   const visibleSections = useMemo(
@@ -145,6 +168,7 @@ export default function SubjectPage() {
         (subsection._id || `${selectedSection?._id}-${index}`) === activeSubsectionId,
     ) || null;
   const hasSubsections = sectionSubsections.length > 0;
+  const isPageLoading = isChaptersLoading || isSectionsLoading;
   const layoutClass = "grid-cols-2 lg:grid-cols-4";
   const actionRowClass = "mt-2 flex flex-wrap items-center gap-2";
 
@@ -267,6 +291,10 @@ export default function SubjectPage() {
       resetSubsectionEditor();
     }
   };
+
+  if (isPageLoading) {
+    return <Loading loading />;
+  }
 
   return (
     <div className="mx-auto w-full max-w-[95%] pb-4 pt-3 text-slate-900">

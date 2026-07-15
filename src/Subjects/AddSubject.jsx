@@ -8,15 +8,19 @@ export default function AddSubject() {
   const [subjectName, setSubjectName] = useState("");
   const [customSubjectName, setCustomSubjectName] = useState("");
   const [order, setOrder] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const addSubjectCalled = useAddSubject();
   const isCustomSubject = subjectName === "__custom__";
 
   const handleAddSubject = async (e) => {
     e.preventDefault();
+    if (isSubmitting) return;
+
     const finalSubjectName = isCustomSubject
       ? customSubjectName.trim()
       : subjectName.trim();
 
+    setIsSubmitting(true);
     try {
       await addSubjectCalled(classId, finalSubjectName, order);
       setSubjectName("");
@@ -26,6 +30,8 @@ export default function AddSubject() {
     } catch (error) {
       console.log("error adding class: ", error?.response?.data?.msg);
       return navigate(`/${classId}`);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -101,8 +107,12 @@ export default function AddSubject() {
             />
           </div>
 
-          <button className="w-full rounded-2xl bg-slate-900 px-5 py-3 text-sm font-semibold text-white transition hover:bg-slate-800 sm:w-auto">
-            Add Subject
+          <button
+            type="submit"
+            disabled={isSubmitting}
+            className="w-full rounded-2xl bg-slate-900 px-5 py-3 text-sm font-semibold text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-70 sm:w-auto"
+          >
+            {isSubmitting ? "Adding Subject..." : "Add Subject"}
           </button>
         </form>
       </div>

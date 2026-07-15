@@ -6,9 +6,13 @@ export default function AddClass() {
   const navigate = useNavigate();
   const [classes, setClasses] = useState("");
   const [order, setOrder] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleAddClass = async (e) => {
     e.preventDefault();
+    if (isSubmitting) return;
+
+    setIsSubmitting(true);
     try {
       await api.post(`/api/class/add-class`, { classes, order });
       setClasses("");
@@ -16,6 +20,8 @@ export default function AddClass() {
       return navigate("/");
     } catch (error) {
       console.log("error adding class: ", error?.response?.data?.msg);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -63,9 +69,10 @@ export default function AddClass() {
 
           <button
             type="submit"
-            className="w-full rounded-2xl bg-slate-900 px-5 py-3 text-sm font-semibold text-white transition hover:bg-slate-800 sm:w-auto"
+            disabled={isSubmitting}
+            className="w-full rounded-2xl bg-slate-900 px-5 py-3 text-sm font-semibold text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-70 sm:w-auto"
           >
-            Add Class
+            {isSubmitting ? "Adding Class..." : "Add Class"}
           </button>
         </form>
       </div>

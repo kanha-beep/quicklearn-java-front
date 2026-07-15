@@ -1,9 +1,14 @@
-import React from "react";
+import React, { useState } from "react";
 
 export function AddSectionButton({ navigate, c, classId, subjectId, subjectName }) {
+  const [selectedAction, setSelectedAction] = useState("");
+
   const handleChange = (e) => {
     const value = e.target.value;
+    setSelectedAction("");
+
     if (!value) return;
+
     navigate(`/${classId}/${subjectId}/${c?._id}/add-sections`, {
       state: {
         addButton: value,
@@ -19,6 +24,7 @@ export function AddSectionButton({ navigate, c, classId, subjectId, subjectName 
   return (
     <>
       <select
+        value={selectedAction}
         onChange={handleChange}
         className="btn form-select-sm btn-outline-info btn-sm w-25"
       >

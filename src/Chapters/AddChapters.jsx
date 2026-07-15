@@ -15,6 +15,7 @@ export default function AddChapters() {
   const [order, setOrder] = useState("");
   const [chaptersList, setChaptersList] = useState([]);
   const [chapterName, setChapterName] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleAddChapter = () => {
     AddChapterToList(
@@ -28,7 +29,10 @@ export default function AddChapters() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    AddChapter(
+    if (isSubmitting) return;
+
+    setIsSubmitting(true);
+    await AddChapter(
       classId,
       chaptersList,
       api,
@@ -37,6 +41,7 @@ export default function AddChapters() {
       setChapterName,
       navigate,
     );
+    setIsSubmitting(false);
   };
 
   return (
@@ -110,7 +115,7 @@ export default function AddChapters() {
           </div>
 
           <div className="w-full sm:w-auto">
-            <SaveChapterButton />
+            <SaveChapterButton isSubmitting={isSubmitting} />
           </div>
         </form>
       </div>

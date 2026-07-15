@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { EditSectionButton } from "./SectionsButtons/EditSectionButton";
 import { DeleteSectionButton } from "./SectionsButtons/DeleteSectionButton";
 import { useSections } from "../hooks";
+import { Loading } from "../Components/Loading.jsx";
 
 export default function SectionsList({
   handleDeleteSection,
@@ -41,7 +42,11 @@ export default function SectionsList({
     }
   };
 
-  const allSections = useSections(subjectId, chapterId);
+  const { sections: allSections, isLoading } = useSections(subjectId, chapterId);
+
+  if (isLoading) {
+    return <Loading loading />;
+  }
 
   return (
     <div>
